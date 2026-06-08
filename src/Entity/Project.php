@@ -23,6 +23,9 @@ class Project
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $difficulties = null;
+
     #[ORM\Column]
     private array $technologies = [];
 
@@ -78,6 +81,24 @@ class Project
     public function setLink(?string $link): static
     {
         $this->link = $link;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of difficulties
+     */
+    public function getDifficulties(): ?string
+    {
+        return $this->difficulties;
+    }
+
+    /**
+     * Set the value of difficulties
+     */
+    public function setDifficulties(?string $difficulties): self
+    {
+        $this->difficulties = $difficulties;
 
         return $this;
     }
