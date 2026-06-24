@@ -5,32 +5,49 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 
 use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource]
+#[ApiResource(normalizationContext: ["groups" => ["project:read"]])]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['project:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['project:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['project:read'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['project:read'])]
     private ?string $difficulties = null;
 
-    #[ORM\Column]
-    private array $technologies = [];
-
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['project:read'])]
     private ?string $link = null;
+
+    /**
+     * @var Collection<int, Techno>
+     */
+    #[ORM\ManyToMany(targetEntity: Techno::class, inversedBy: 'projects')]
+    #[Groups(['project:read'])]
+    private Collection $techno;
+
+    public function __construct()
+    {
+        $this->techno = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -61,18 +78,6 @@ class Project
         return $this;
     }
 
-    public function getTechnologies(): array
-    {
-        return $this->technologies;
-    }
-
-    public function setTechnologies(array $technologies): static
-    {
-        $this->technologies = $technologies;
-
-        return $this;
-    }
-
     public function getLink(): ?string
     {
         return $this->link;
@@ -99,6 +104,30 @@ class Project
     public function setDifficulties(?string $difficulties): self
     {
         $this->difficulties = $difficulties;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Techno>
+     */
+    public function getTechno(): Collection
+    {
+        return $this->techno;
+    }
+
+    public function addTechno(Techno $techno): static
+    {
+        if (!$this->techno->contains($techno)) {
+            $this->techno->add($techno);
+        }
+
+        return $this;
+    }
+
+    public function removeTechno(Techno $techno): static
+    {
+        $this->techno->removeElement($techno);
 
         return $this;
     }
