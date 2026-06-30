@@ -54,7 +54,7 @@ class MediaObject
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'project:read', 'techno:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -63,7 +63,7 @@ class MediaObject
     #[Vich\UploadableField(mapping: 'media_object', fileNameProperty: 'filePath')]
     public ?File $file = null;
 
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'project:read', 'techno:read'])]
     #[ApiProperty(types: ['https://schema.org/contentUrl'])] 
     public ?string $contentUrl = null;
 

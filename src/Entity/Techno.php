@@ -29,6 +29,10 @@ class Techno
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'techno')]
     private Collection $projects;
 
+    #[ORM\ManyToOne]
+    #[Groups(['project:read', 'techno:read', 'techno:write'])]
+    private ?MediaObject $logo = null;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
@@ -74,6 +78,18 @@ class Techno
         if ($this->projects->removeElement($project)) {
             $project->removeTechno($this);
         }
+
+        return $this;
+    }
+
+    public function getLogo(): ?MediaObject
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?MediaObject $logo): static
+    {
+        $this->logo = $logo;
 
         return $this;
     }
