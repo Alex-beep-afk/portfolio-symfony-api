@@ -11,7 +11,10 @@ use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource(normalizationContext: ["groups" => ["project:read"]])]
+#[ApiResource(
+    normalizationContext: ["groups" => ["project:read"]],
+    denormalizationContext: ["groups" => ["project:write"]]
+)]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {

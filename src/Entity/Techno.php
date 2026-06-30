@@ -10,17 +10,21 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TechnoRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['techno:read']],
+    denormalizationContext: ['groups' => ['techno:write']]
+)]
+
 class Techno
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read', "techno:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read','techno:read'])]
     private ?string $title = null;
 
     /**
