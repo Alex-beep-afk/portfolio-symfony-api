@@ -25,26 +25,26 @@ class Project
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read', 'project:write'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read', 'project:write'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read', 'project:write'])]
     private ?string $difficulties = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read', 'project:write'])]
     private ?string $link = null;
 
     /**
      * @var Collection<int, Techno>
      */
     #[ORM\ManyToMany(targetEntity: Techno::class, inversedBy: 'projects')]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read', 'project:write'])]
     private Collection $techno;
 
     #[ORM\ManyToOne]
