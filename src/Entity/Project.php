@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
+    paginationEnabled: false,
     normalizationContext: ["groups" => ["project:read"]],
     denormalizationContext: ["groups" => ["project:write"]]
 )]
@@ -39,6 +40,10 @@ class Project
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['project:read', 'project:write'])]
     private ?string $link = null;
+
+    #[ORM\Column(length:255, nullable: true )]
+    #[Groups(['project:read', 'project:write'])]
+    private ?string $githubLink = null;
 
     /**
      * @var Collection<int, Techno>
@@ -179,6 +184,24 @@ class Project
     public function removeGallery(MediaObject $gallery): static
     {
         $this->gallery->removeElement($gallery);
+
+        return $this;
+    }
+
+    /**
+     * Get the value of githubLink
+     */
+    public function getGithubLink(): ?string
+    {
+        return $this->githubLink;
+    }
+
+    /**
+     * Set the value of githubLink
+     */
+    public function setGithubLink(?string $githubLink): self
+    {
+        $this->githubLink = $githubLink;
 
         return $this;
     }
