@@ -15,12 +15,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class MessageContact
 {
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(["contact:read"])]
     private ?int $id = null;
-    
+
     #[ORM\Column(length: 255)]
     #[Groups(["contact:read", "contact:write"])]
     private ?string $object = null;
@@ -96,6 +101,9 @@ class MessageContact
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
+        if ($this->createdAt === null) {
+            $this->createdAt = new \DateTimeImmutable();
+        }
         return $this->createdAt;
     }
 
@@ -106,11 +114,5 @@ class MessageContact
         return $this;
     }
 
-    #[ORM\PrePersist]
-    public function autoCreatedAt(): static
-    {
-        $this->createdAt = new \DateTimeImmutable();
 
-        return $this;
-    }
 }
