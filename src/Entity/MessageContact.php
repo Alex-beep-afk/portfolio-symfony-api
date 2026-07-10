@@ -45,6 +45,10 @@ class MessageContact
     #[ORM\Column]
     #[Groups(["contact:read"])]
     private ?\DateTimeImmutable $createdAt = null;
+    // TODO : enlever le nullable quand pret à mettre en production
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["contact:read", "contact:write"])]
+    private ?string $name = null;
 
     public function getId(): ?int
     {
@@ -110,6 +114,18 @@ class MessageContact
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }
