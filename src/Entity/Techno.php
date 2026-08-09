@@ -7,6 +7,9 @@ use App\Repository\TechnoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TechnoRepository::class)]
@@ -15,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
     denormalizationContext: ['groups' => ['techno:write']]
 )]
 
+#[ApiFilter(BooleanFilter::class, properties: ['active'])]
 class Techno
 {
     #[ORM\Id]
@@ -24,7 +28,7 @@ class Techno
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['project:read','techno:read'])]
+    #[Groups(['project:read', 'techno:read', 'techno:write'])]
     private ?string $title = null;
 
     /**
@@ -33,9 +37,13 @@ class Techno
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'techno')]
     private Collection $projects;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ["remove"])]
     #[Groups(['project:read', 'techno:read', 'techno:write'])]
     private ?MediaObject $logo = null;
+
+    #[ORM\Column]
+    #[Groups(['techno:read', 'techno:write'])]
+    private ?bool $active = true;
 
     public function __construct()
     {
@@ -94,6 +102,19 @@ class Techno
     public function setLogo(?MediaObject $logo): static
     {
         $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }
