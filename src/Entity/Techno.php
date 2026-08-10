@@ -9,11 +9,26 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+
 
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TechnoRepository::class)]
 #[ApiResource(
+    operations: [
+        new GetCollection(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Get(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Post(security: 'is_granted("ROLE_ADMIN")'),
+        new Put(security: 'is_granted("ROLE_ADMIN")'),
+        new Patch(security: 'is_granted("ROLE_ADMIN")'),
+        new Delete(security: 'is_granted("ROLE_ADMIN")')
+    ],
     normalizationContext: ['groups' => ['techno:read']],
     denormalizationContext: ['groups' => ['techno:write']]
 )]
