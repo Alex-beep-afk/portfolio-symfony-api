@@ -52,14 +52,14 @@ class Project
     #[Groups(['project:read', 'project:write'])]
     private Collection $techno;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ["remove"])]
     #[Groups(['project:read', 'project:write'])]
     private ?MediaObject $coverImage = null;
 
     /**
      * @var Collection<int, MediaObject>
      */
-    #[ORM\ManyToMany(targetEntity: MediaObject::class)]
+    #[ORM\ManyToMany(targetEntity: MediaObject::class, cascade: ["remove"])]
     #[Groups(['project:read', 'project:write'])]
     private Collection $gallery;
 
