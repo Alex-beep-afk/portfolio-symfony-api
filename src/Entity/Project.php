@@ -10,8 +10,25 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 
+#[ApiFilter(BooleanFilter::class, properties: ['active'])]
 #[ApiResource(
+    operations: [
+        new GetCollection(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Get(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Post(security: 'is_granted("ROLE_ADMIN")'),
+        new Put(security: 'is_granted("ROLE_ADMIN")'),
+        new Patch(security: 'is_granted("ROLE_ADMIN")'),
+        new Delete(security: 'is_granted("ROLE_ADMIN")')
+    ],
     paginationEnabled: false,
     normalizationContext: ["groups" => ["project:read"]],
     denormalizationContext: ["groups" => ["project:write"]]
@@ -62,6 +79,11 @@ class Project
     #[ORM\ManyToMany(targetEntity: MediaObject::class, cascade: ["remove"])]
     #[Groups(['project:read', 'project:write'])]
     private Collection $gallery;
+
+
+    #[ORM\Column]
+    #[Groups(['project:read', 'project:write'])]
+    private ?bool $active = true;
 
     public function __construct()
     {
@@ -202,6 +224,19 @@ class Project
     public function setGithubLink(?string $githubLink): self
     {
         $this->githubLink = $githubLink;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        
+        return $this->active;
+    }
+
+    public function setActive(?bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }
