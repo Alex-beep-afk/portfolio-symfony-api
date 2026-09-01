@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Entity;
+
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\TechnoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+
+
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: TechnoRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Get(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Post(security: 'is_granted("ROLE_ADMIN")'),
+        new Put(security: 'is_granted("ROLE_ADMIN")'),
+        new Patch(security: 'is_granted("ROLE_ADMIN")'),
+        new Delete(security: 'is_granted("ROLE_ADMIN")')
+    ],
+    normalizationContext: ['groups' => ['techno:read']],
+    denormalizationContext: ['groups' => ['techno:write']]
+)]
+
+#[ApiFilter(BooleanFilter::class, properties: ['active'])]
+class Techno
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['project:read', "techno:read"])]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['project:read', 'techno:read', 'techno:write'])]
+    private ?string $title = null;
+
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'techno')]
+    private Collection $projects;
+
+    #[ORM\ManyToOne(cascade: ["remove"])]
+    #[Groups(['project:read', 'techno:read', 'techno:write'])]
+    private ?MediaObject $logo = null;
+
+    #[ORM\Column]
+    #[Groups(['techno:read', 'techno:write'])]
+    private ?bool $active = true;
+
+    public function __construct()
+    {
+        $this->projects = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+            $project->addTechno($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static
+    {
+        if ($this->projects->removeElement($project)) {
+            $project->removeTechno($this);
+        }
+
+        return $this;
+    }
+
+    public function getLogo(): ?MediaObject
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?MediaObject $logo): static
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+}
