@@ -21,10 +21,11 @@ use ApiPlatform\Metadata\ApiProperty;
     
     types: ['https://schema.org/MediaObject'],
     operations: [
-        new Get(),
-        new GetCollection(),
+        new Get(security: 'is_granted("ROLE_ADMIN")'),
+        new GetCollection(security: 'is_granted("ROLE_ADMIN")'),
         new Post(
             processor: \App\State\MediaObjectProcessor::class,
+            security: 'is_granted("ROLE_ADMIN")',
             deserialize: false,
             inputFormats: ['multipart' => ['multipart/form-data']],
             openapi: new Model\Operation(

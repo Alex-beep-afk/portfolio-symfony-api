@@ -6,10 +6,21 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\MessageContactRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
 
 
 #[ORM\Entity(repositoryClass: MessageContactRepository::class)]
 #[ApiResource(
+    operations: [
+        new Post(security: 'is_granted("PUBLIC_ACCESS")'),
+        new GetCollection(security: 'is_granted("ROLE_ADMIN")'),
+        new Get(security: 'is_granted("ROLE_ADMIN")'),
+        new Delete(security: 'is_granted("ROLE_ADMIN")'),
+    ],
+
     normalizationContext: ["groups" => ["contact:read"]],
     denormalizationContext: ["groups" => ["contact:write"]]
 )]
