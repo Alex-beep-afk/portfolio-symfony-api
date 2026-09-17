@@ -10,8 +10,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -20,6 +23,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 
 #[ApiFilter(BooleanFilter::class, properties: ['active'])]
+#[ApiFilter(OrderFilter::class, properties: ['favoritePosition' => 'ASC'])]
+#[ApiFilter(ExistsFilter::class, properties: ['favoritePosition'])]
 #[ApiResource(
     operations: [
         new GetCollection(security: 'is_granted("PUBLIC_ACCESS")'),
@@ -62,6 +67,14 @@ class Project
     #[Groups(['project:read', 'project:write'])]
     private ?string $githubLink = null;
 
+    #[ORM\Column(length:255, nullable: true)]
+    #[Groups(['project:read', 'project:write'])]
+    private ?string $type = null;
+
+    #[ORM\Column(length:255, nullable: true)]
+    #[Groups(['project:read', 'project:write'])]
+    private ?string $category = null;
+
     /**
      * @var Collection<int, Techno>
      */
@@ -84,6 +97,11 @@ class Project
     #[ORM\Column]
     #[Groups(['project:read', 'project:write'])]
     private ?bool $active = true;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[Assert\Range(min: 1, max: 4, notInRangeMessage: 'La position doit être comprise entre 1 et 4')]
+    #[Groups(['project:read', 'project:write'])]
+    private ?int $favoritePosition = null;
 
     public function __construct()
     {
@@ -237,6 +255,54 @@ class Project
     public function setActive(?bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getFavoritePosition(): ?int
+    {
+        return $this->favoritePosition;
+    }
+
+    public function setFavoritePosition(?int $favoritePosition): static
+    {
+        $this->favoritePosition = $favoritePosition;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of type
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set the value of type
+     */
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of category
+     */
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    /**
+     * Set the value of category
+     */
+    public function setCategory(?string $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }
